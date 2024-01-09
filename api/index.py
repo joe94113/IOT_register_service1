@@ -4,6 +4,7 @@ from flask import jsonify
 import paho.mqtt.client as mqtt
 import time
 import json
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -61,16 +62,34 @@ client.message_callback_add('joe/service/register', on_message_joe_service_regis
 client.connect(MQTT_BROKER_ADDRESS, 1883, 60)  # 連接 MQTT 伺服器
 client.loop_start()
 # Helper function to read/write JSON data
+# def read_json(filename):
+#     try:
+#         with open(filename, 'r') as file:
+#             return json.load(file)
+#     except (FileNotFoundError, json.JSONDecodeError):
+#         return {}
 def read_json(filename):
+    # 假設此腳本（index.py）位於 'api' 目錄中，且需要讀取 'api/tmp/users.json'
+    filepath = os.path.join('tmp', filename)
     try:
-        with open(filename, 'r') as file:
+        with open(filepath, 'r') as file:
             return json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError):
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Error reading {filepath}: {e}")
         return {}
 
+# def write_json(data, filename):
+#     with open(filename, 'w') as file:
+#         json.dump(data, file)
+
 def write_json(data, filename):
-    with open(filename, 'w') as file:
-        json.dump(data, file)
+    # 假設此腳本（index.py）位於 'api' 目錄中，且需要寫入 'api/tmp/users.json'
+    filepath = os.path.join('tmp', filename)
+    try:
+        with open(filepath, 'w') as file:
+            json.dump(data, file)
+    except OSError as e:
+        print(f"Error writing to {filepath}: {e}")
 
 # Routes
 @app.route("/")
@@ -81,10 +100,10 @@ def index():
 def register():
     if request.method == "POST":
         username = request.form["username"]
-        users = read_json("/tmp/users.json")
+        users = read_json("users.json")
         if username not in users:
             users[username] = {'enabled': False}
-            write_json(users, "/tmp/users.json")
+            write_json(users, "users.json")
             return redirect(url_for('login'))
         else:
             return "<p>Username already exists.</p> and <a href='/login'>Login</a>"
@@ -95,7 +114,7 @@ def login():
     global current_user
     if request.method == "POST":
         username = request.form["username"]
-        users = read_json("/tmp/users.json")
+        users = read_json("users.json")
         if username in users:
             session['username'] = username
             current_user = username
@@ -107,7 +126,7 @@ def login():
 # show all user device
 @app.route("/device", methods=["GET"])
 def device():
-    users = read_json("/tmp/users.json")
+    users = read_json("users.json")
     for user in users:
         if 'inputDevice' not in users[user]:
             users[user]['inputDevice'] = {}
@@ -139,12 +158,11 @@ def toggle_user_status():
     data = request.json
     username = data.get('username')
 
-    users = read_json("/tmp/users.json")
+    users = read_json("users.json")
 
     if username in users:
-        print(users[username]);
         users[username]['enabled'] = users[username]['enabled'] ^ True
-        write_json(users, "/tmp/users.json")
+        write_json(users, "users.json")
         return jsonify({"message": "User status updated successfully."}), 200
 
     return jsonify({"error": "User not found."}), 404
@@ -168,7 +186,7 @@ def admin():
             print("Subscribing to joe/service/register")
             client.subscribe("joe/service/register")
             # return "<p>Welcome to the admin page!</p>"
-            users = read_json("/tmp/users.json")
+            users = read_json("users.json")
             if current_user in users:
                 if 'inputDevice' not in users[current_user]:
                     users[current_user]['inputDevice'] = {}
@@ -199,5 +217,5 @@ def admin():
         return redirect(url_for('login'))
 
 if __name__ == "__main__":
-    app.run(debug=True, threaded=True)
+    app.run(debug=False, threaded=True)
 
