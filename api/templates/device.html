@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Home Page{% endblock %}
+{% block body %}
+<div class="container mt-4">
+    <a href="/login" class="btn btn-primary mb-3">Login</a>
+    {% for user in users %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">User: {{ user }}</h5>
+                    <!-- 啟用/禁用按鈕 -->
+                    <button class="btn btn-sm {{ 'btn-success' if users[user]['enabled'] else 'btn-danger' }}" 
+                            onclick="toggleUserStatus('{{ user }}')">
+                        {{ '啟用' if users[user]['enabled'] else '禁用' }}
+                    </button>
+                </div>
+                <p class="card-text mt-2">裝置ID: {{ users[user]['inputDevice']['id'] }}</p>
+                <h6 class="card-subtitle mb-2 text-muted">訂閱主題:</h6>
+                <ul class="list-group list-group-flush">
+                    {% for device in users[user]['outputDevices'] %}
+                        <li class="list-group-item">{{ device['type'] }}，訂閱 {{ device['subTopic'] }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+function toggleUserStatus(username) {
+    fetch('/toggle_user_status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: username,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.message);
+        window.location.reload();
+        // 這裡可以添加更多的邏輯來動態更新頁面
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,1 @@
+{"admin": {"enabled": false, "inputDevice": {"id": "SmartDisasterPrevention1234", "type": "SmartDisasterPrevention"}, "outputDevices": [{"id": "flameAlarm1234", "type": "flameAlarm", "subTopic": "SmartDisasterPrevention/flameAlarm/flameAlarm1234"}, {"id": "temperature1234", "type": "temperature", "subTopic": "SmartDisasterPrevention/temperature/temperature1234"}]}}
