@@ -53,7 +53,7 @@ def on_message_joe_service_register(client, userdata, msg):
 # 替換為您的 MQTT 伺服器地址
 MQTT_BROKER_ADDRESS = '140.116.86.204'
 
-client = mqtt.Client("joe_client113")  # 替換為您的客戶端名稱
+client = mqtt.Client("joe94113")  # 替換為您的客戶端名稱
 flag_connected = 0
 current_user = ''
 client.on_connect = on_connect
@@ -62,34 +62,34 @@ client.message_callback_add('joe/service/register', on_message_joe_service_regis
 client.connect(MQTT_BROKER_ADDRESS, 1883, 60)  # 連接 MQTT 伺服器
 client.loop_start()
 # Helper function to read/write JSON data
-# def read_json(filename):
-#     try:
-#         with open(filename, 'r') as file:
-#             return json.load(file)
-#     except (FileNotFoundError, json.JSONDecodeError):
-#         return {}
 def read_json(filename):
-    # 假設此腳本（index.py）位於 'api' 目錄中，且需要讀取 'api/tmp/users.json'
-    filepath = os.path.join('tmp', filename)
     try:
-        with open(filepath, 'r') as file:
+        with open(filename, 'r') as file:
             return json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        print(f"Error reading {filepath}: {e}")
+    except (FileNotFoundError, json.JSONDecodeError):
         return {}
-
-# def write_json(data, filename):
-#     with open(filename, 'w') as file:
-#         json.dump(data, file)
+# def read_json(filename):
+#     # 假設此腳本（index.py）位於 'api' 目錄中，且需要讀取 'api/tmp/users.json'
+#     filepath = os.path.join('tmp', filename)
+#     try:
+#         with open(filepath, 'r') as file:
+#             return json.load(file)
+#     except (FileNotFoundError, json.JSONDecodeError) as e:
+#         print(f"Error reading {filepath}: {e}")
+#         return {}
 
 def write_json(data, filename):
-    # 假設此腳本（index.py）位於 'api' 目錄中，且需要寫入 'api/tmp/users.json'
-    filepath = os.path.join('tmp', filename)
-    try:
-        with open(filepath, 'w') as file:
-            json.dump(data, file)
-    except OSError as e:
-        print(f"Error writing to {filepath}: {e}")
+    with open(filename, 'w') as file:
+        json.dump(data, file)
+
+# def write_json(data, filename):
+#     # 假設此腳本（index.py）位於 'api' 目錄中，且需要寫入 'api/tmp/users.json'
+#     filepath = os.path.join('tmp', filename)
+#     try:
+#         with open(filepath, 'w') as file:
+#             json.dump(data, file)
+#     except OSError as e:
+#         print(f"Error writing to {filepath}: {e}")
 
 # Routes
 @app.route("/")
