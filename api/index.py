@@ -58,7 +58,7 @@ current_user = ''
 client.on_connect = on_connect
 client.on_disconnect = on_disconnect
 client.message_callback_add('joe/service/register', on_message_joe_service_register)
-client.connect(MQTT_BROKER_ADDRESS, 1883)  # 連接 MQTT 伺服器
+client.connect(MQTT_BROKER_ADDRESS, 1883, 60)  # 連接 MQTT 伺服器
 client.loop_start()
 # Helper function to read/write JSON data
 def read_json(filename):
