@@ -71,10 +71,10 @@ def index():
 def register():
     if request.method == "POST":
         username = request.form["username"]
-        users = read_json("tmp/users.json")
+        users = read_json("/tmp/users.json")
         if username not in users:
             users[username] = {'enabled': False}
-            write_json(users, "tmp/users.json")
+            write_json(users, "/tmp/users.json")
             return redirect(url_for('login'))
         else:
             return "<p>Username already exists.</p> and <a href='/login'>Login</a>"
@@ -85,7 +85,7 @@ def login():
     global current_user
     if request.method == "POST":
         username = request.form["username"]
-        users = read_json("tmp/users.json")
+        users = read_json("/tmp/users.json")
         if username in users:
             session['username'] = username
             current_user = username
@@ -97,7 +97,7 @@ def login():
 # show all user device
 @app.route("/device", methods=["GET"])
 def device():
-    users = read_json("tmp/users.json")
+    users = read_json("/tmp/users.json")
     for user in users:
         if 'inputDevice' not in users[user]:
             users[user]['inputDevice'] = {}
@@ -129,12 +129,12 @@ def toggle_user_status():
     data = request.json
     username = data.get('username')
 
-    users = read_json("tmp/users.json")
+    users = read_json("/tmp/users.json")
 
     if username in users:
         print(users[username]);
         users[username]['enabled'] = users[username]['enabled'] ^ True
-        write_json(users, "tmp/users.json")
+        write_json(users, "/tmp/users.json")
         return jsonify({"message": "User status updated successfully."}), 200
 
     return jsonify({"error": "User not found."}), 404
@@ -158,7 +158,7 @@ def admin():
             print("Subscribing to joe/service/register")
             client.subscribe("joe/service/register")
             # return "<p>Welcome to the admin page!</p>"
-            users = read_json("tmp/users.json")
+            users = read_json("/tmp/users.json")
             if current_user in users:
                 if 'inputDevice' not in users[current_user]:
                     users[current_user]['inputDevice'] = {}
