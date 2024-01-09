@@ -40,7 +40,7 @@ def on_message_joe_service_register(client, userdata, msg):
         print(f"Error processing message: {e}")
 
 # 替換為您的 MQTT 伺服器地址
-MQTT_BROKER_ADDRESS = '140.116.86.204:1883'
+MQTT_BROKER_ADDRESS = '140.116.86.204'
 
 client = mqtt.Client("joe_client")  # 替換為您的客戶端名稱
 flag_connected = 0
