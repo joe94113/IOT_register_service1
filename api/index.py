@@ -21,20 +21,30 @@ def on_disconnect(client, userdata, rc):
 
 def on_message_joe_service_register(client, userdata, msg):
     global current_user
+    # print(str(msg.payload.decode('utf-8')))
     try:
-        data = json.loads(msg.payload.decode('utf-8'))
+        data = msg.payload.decode('utf-8')
+        try:
+            data = json.loads(data)  # 確保從解碼後的字符串加載 JSON
+        except json.JSONDecodeError:
+            print(f"Payload is not a valid JSON string: {data}")
+            return
+
+        # 確保 data 是一個字典
+        if not isinstance(data, dict):
+            print(f"Payload is not a dictionary: {data}")
+            return
+
         username = data.get('username')
-
         if username and username == current_user:
-            input_device = data['devicePair']['inputDevice']
-            output_devices = data['devicePair']['outputDevices']
-
             users = read_json("users.json")
-            users[current_user]['inputDevice'] = input_device
-            users[current_user]['outputDevices'] = output_devices
-
-            write_json(users, "users.json")
-            print(f"Device info updated for user: {current_user}")
+            if current_user in users:
+                users[current_user]['inputDevice'] = data['devicePair']['inputDevice']
+                users[current_user]['outputDevices'] = data['devicePair']['outputDevices']
+                write_json(users, "users.json")
+                print(f"Device info updated for user: {current_user}")
+            else:
+                print(f"User {current_user} not found in users.json")
 
     except Exception as e:
         print(f"Error processing message: {e}")
@@ -48,7 +58,7 @@ current_user = ''
 client.on_connect = on_connect
 client.on_disconnect = on_disconnect
 client.message_callback_add('joe/service/register', on_message_joe_service_register)
-client.connect(MQTT_BROKER_ADDRESS, 1883, 60)  # 連接 MQTT 伺服器
+client.connect(MQTT_BROKER_ADDRESS, 1883)  # 連接 MQTT 伺服器
 client.loop_start()
 # Helper function to read/write JSON data
 def read_json(filename):
